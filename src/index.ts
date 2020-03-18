@@ -21,7 +21,12 @@ const interval$ = new Observable<number>(subs => {
 });
 
 const subject$ = new Subject<number>();
-interval$.subscribe(subject$);
+const subscription = interval$.subscribe(subject$);
 
 const subs1 = subject$.subscribe(observer);
 const subs2 = subject$.subscribe(console.info);
+
+setTimeout(() => {
+    subject$.complete();
+    subscription.unsubscribe();
+}, 6e3);
