@@ -1,7 +1,10 @@
-import { range, asyncScheduler } from 'rxjs';
+import { interval, timer } from 'rxjs';
 
-const src$ = range(1, 100, asyncScheduler);
+const interval$ = interval(1e3);
+const timer$ = timer(2e3);
 
-src$.subscribe(value => {
+timer$.subscribe(value => {
     document.getElementById('app').innerText += ', ' + value;
-});
+},
+null,
+() => alert('done'));
