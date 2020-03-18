@@ -24,4 +24,22 @@ const obs$ = new Observable<string>(subscriber => {
     subscriber.complete();
 });
 
-obs$.subscribe(observer);
+// obs$.subscribe(observer);
+const interval$ = new Observable<number>(subscriber => {
+    let i = 0;
+    const interval = setInterval(() => subscriber.next(i++), 1e3);
+
+    return () => clearInterval(interval);
+});
+
+const subs = interval$.subscribe({
+    next(value) {
+        console.info(value);
+    },
+    error: console.warn,
+    complete() {
+        alert('Ciao');
+    }
+});
+
+setTimeout(() => subs.unsubscribe(), 3e3);
