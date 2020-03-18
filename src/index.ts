@@ -1,4 +1,4 @@
-import { Observable, Observer } from 'rxjs';
+import { Observable, Observer, Subject } from 'rxjs';
 
 const observer: Observer<string|number> = {
     next(value) {
@@ -14,37 +14,14 @@ const observer: Observer<string|number> = {
     }
 };
 
-const obs$ = new Observable<string>(subscriber => {
-    subscriber.next('Hola');
-    subscriber.next('Mundo');
-
-    // const a = undefined;
-    // a.nombre = 'Fernando';
-
-    subscriber.complete();
-});
-
-// obs$.subscribe(observer);
-const interval$ = new Observable<number>(subscriber => {
-    let i = 0;
-    const interval = setInterval(() => subscriber.next(++i), 1e3);
-
-    setTimeout(() => subscriber.complete(), 2500);
+const interval$ = new Observable<number>(subs => {
+    const interval = setInterval(() => subs.next(Math.random()), 1e3);
 
     return () => clearInterval(interval);
 });
 
-const subs1 = interval$.subscribe({
-    next(value) {
-        console.info(value);
-    },
-    error: console.warn,
-    complete() {
-        alert('Ciao');
-    }
-});
-const subs2 = interval$.subscribe(observer);
+const subject$ = new Subject<number>();
+interval$.subscribe(subject$);
 
-subs1.add(subs2);
-
-setTimeout(() => subs1.unsubscribe(), 3e3);
+const subs1 = subject$.subscribe(observer);
+const subs2 = subject$.subscribe(console.info);
