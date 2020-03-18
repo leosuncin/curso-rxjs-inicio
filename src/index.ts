@@ -1,16 +1,16 @@
 import { Observable, Observer } from 'rxjs';
 
-const observer: Observer<string> = {
+const observer: Observer<string|number> = {
     next(value) {
         const p = document.createElement('p');
-        p.innerText = value;
+        p.innerText = String(value);
         document.body.appendChild(p);
     },
     error(error) {
         alert(error)
     },
     complete() {
-        document.body.style.backgroundColor = 'black';
+        alert('Done');
     }
 };
 
@@ -27,12 +27,14 @@ const obs$ = new Observable<string>(subscriber => {
 // obs$.subscribe(observer);
 const interval$ = new Observable<number>(subscriber => {
     let i = 0;
-    const interval = setInterval(() => subscriber.next(i++), 1e3);
+    const interval = setInterval(() => subscriber.next(++i), 1e3);
+
+    setTimeout(() => subscriber.complete(), 2500);
 
     return () => clearInterval(interval);
 });
 
-const subs = interval$.subscribe({
+const subs1 = interval$.subscribe({
     next(value) {
         console.info(value);
     },
@@ -41,5 +43,8 @@ const subs = interval$.subscribe({
         alert('Ciao');
     }
 });
+const subs2 = interval$.subscribe(observer);
 
-setTimeout(() => subs.unsubscribe(), 3e3);
+subs1.add(subs2);
+
+setTimeout(() => subs1.unsubscribe(), 3e3);
